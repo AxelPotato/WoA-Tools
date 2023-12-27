@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audio Link Extractor</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <h2 class="mt-5">Google Drive Audio Link Extractor</h2>
+        <form method="POST" class="mt-3">
+            <div class="form-group">
+                <label for="url">Google Drive Audio Link</label>
+                <input type="text" class="form-control" id="url" name="url" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Extract</button>
+        </form>
+    {% if audio_code %}
+        <div class="mt-3">
+            <div>
+                <strong>File Name:</strong> <span id="fileName">{{ file_name }}</span>
+                <button class="btn btn-secondary btn-sm" onclick="copyToClipboard('fileName')">Copy File Name</button>
+            </div>
+            <div class="mt-2">
+                <strong>Google Drive Link:</strong> <span id="driveLink">https://docs.google.com/uc?export=open&id={{ file_id }}</span>
+                <button class="btn btn-secondary btn-sm" onclick="copyToClipboard('driveLink')">Copy Link</button>
+            </div>
+        </div>
+    {% endif %}
+
+    <script>
+        function copyToClipboard(elementId) {
+            var copyText = document.getElementById(elementId);
+            var textArea = document.createElement("textarea");
+            textArea.value = copyText.textContent;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand("copy");
+            textArea.remove();
+        }
+    </script>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+</body>
+</html>
