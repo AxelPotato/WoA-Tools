@@ -1,3 +1,4 @@
+from collections import namedtuple
 from flask import Flask, render_template, request, redirect, url_for, flash
 from urllib.parse import urlencode, urlparse, urlunparse
 from googleapiclient.discovery import build
@@ -14,6 +15,8 @@ SERVICE_ACCOUNT_FILE = "/home/AxelPotato/mysite/lecture_key.json"
 SCOPES = ["https://www.googleapis.com/auth/drive.metadata.readonly"]
 API_SERVICE_NAME = "drive"
 API_VERSION = "v3"
+
+DriveFileInfo = namedtuple('DriveFileInfo', ('id', 'name'))
 
 
 def get_service():
@@ -47,6 +50,29 @@ def validate_language(lang_text):
         return True
     """Validate language format (2 letters)."""
     return re.match(r"^[a-zA-Z]{2}$", lang_text) is not None
+
+
+def handle_file_url(url):
+    file_id = url.split("/d/")[1].split("/")[0]
+    file_name = get_file_name(file_id)
+
+    return DriveFileInfo(file_id, file_name)
+
+
+def handle_folder_url(url):
+    service = get_service()
+    folder_id = url.split('/')[-1]
+
+    drive_files = service.files().list(q=f"'{folder_id}' in parents",
+                                       supportsAllDrives=True,
+                                       includeItemsFromAllDrives=True,
+                                       pageSize=1000).execute()['files']
+
+    return [DriveFileInfo(drive_file['id'], drive_file['name']) for drive_file in drive_files]
+
+
+def is_folder_url(url):
+    return 'folders' in url
 
 
 @app.route("/", methods=["GET", "POST"])
@@ -86,19 +112,20 @@ def index():
 
 @app.route("/lectures", methods=["GET", "POST"])
 def lectures():
-    audio_code = ""
-    file_name = ""
-    file_id = ""
+    lectures = []
+
     if request.method == "POST":
         url = request.form["url"]
-        file_id = url.split("/d/")[1].split("/")[0]
-        file_name = get_file_name(file_id)
-        audio_code = f"https://docs.google.com/uc?export=open&id={file_id}"
+
+        if is_folder_url(url):
+            lectures = handle_folder_url(url)
+        else:
+            lectures = [handle_file_url(url)]
+
+        
     return render_template(
         "lecture_maker.html",
-        audio_code=audio_code,
-        file_name=file_name,
-        file_id=file_id,
+        lectures=lectures
     )
 
 
