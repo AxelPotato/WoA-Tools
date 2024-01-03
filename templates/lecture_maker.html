@@ -20,11 +20,11 @@
         <div class="mt-3">
             <div>
                 <strong>File Name:</strong> <span id="fileName-{{loop.index}}">{{ lecture.name }}</span>
-                <button class="btn btn-secondary btn-sm" onclick="copyToClipboard('fileName')">Copy File Name</button>
+                <button class="btn btn-secondary btn-sm" onclick="copyToClipboard('fileName-{{loop.index}}')">Copy File Name</button>
             </div>
             <div class="mt-2">
                 <strong>Google Drive Link:</strong> <span id="driveLink-{{loop.index}}">https://docs.google.com/uc?export=open&id={{ lecture.id }}</span>
-                <button class="btn btn-secondary btn-sm" onclick="copyToClipboard('driveLink')">Copy Link</button>
+                <button class="btn btn-secondary btn-sm" onclick="copyToClipboard('driveLink-{{loop.index}}')">Copy Link</button>
             </div>
         </div>
     {% endfor %}
